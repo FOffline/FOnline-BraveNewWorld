@@ -53,6 +53,7 @@ import bool SmartCursorClick( int click ) from "client/smart_cursor";
 import bool GuiImageCatchMouseClick(int click) from "client/client_GuiImage";
 import bool GuiImageCatchMouseRelease(int click) from "client/client_GuiImage";
 import bool GuiImageUpdateMousePositionChange(int x, int y) from "client/client_GuiImage";
+import void GetDialogAvatar(uint dlgId) from "client_screen_dialog";
 
 #define LeftCtrl        GUI_IsKeyPressed(DIK_LCONTROL)
 #define RightCtrl       GUI_IsKeyPressed(DIK_RCONTROL)
@@ -250,6 +251,22 @@ bool mouse_down(int click)
         GUI_ShowScreen(CLIENT_SCREEN_FOLLOWERSMENU, __MouseX, __MouseY, 0);
         return(true);
     }
+	
+	if( click == MOUSE_CLICK_LEFT )
+    {
+		
+		if(GetCurrentMapPid()!=0)
+		{
+			CritterCl @cr = GetMonitorCritter(__MouseX,__MouseY);
+			if(valid(cr))
+			{	
+				uint dlgId=cr.Stat[ST_DIALOG_ID];
+				if(dlgId>0) GetDialogAvatar(dlgId);
+			}
+		
+		}	
+	}
+	
     /*
        else if( GetCurrentCursor() == CURSOR_USE_WEAPON && click == MOUSE_CLICK_LEFT &&
                      GUI_GetActiveScreen() == CLIENT_MAIN_SCREEN_GAME &&
@@ -265,8 +282,7 @@ bool mouse_down(int click)
             return( false );
        }
      */
-    else
-        return(GUI_MouseDown(__MouseX, __MouseY, click));
+    return GUI_MouseDown(__MouseX, __MouseY, click);
 }
 
 bool mouse_up(int click)

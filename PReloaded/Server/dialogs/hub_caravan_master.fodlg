@@ -52,6 +52,7 @@ lang=engl
 
 [engl]
 {100}{}{Caravan Master}
+{110}{}{man6.png}
 {200}{}{You see a caravan master.}
 {210}{}{They should be able to locate any caravan in the wasteland for you. }
 {240}{}{You see a dead caravan master.}

@@ -32,6 +32,7 @@ lang=engl
 
 [engl]
 {100}{}{Caravan Packer}
+{110}{}{man38.png}
 {200}{}{You see a Caravan packer.}
 {210}{}{He looks pretty busy with the caravans.}
 {1000}{}{Predialogue installations}

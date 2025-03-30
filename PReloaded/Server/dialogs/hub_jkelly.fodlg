@@ -64,6 +64,7 @@ lang=engl
 
 [engl]
 {100}{}{Joe Kelly}
+{110}{}{man5.png}
 {200}{}{You see Joe Kelly.}
 {210}{}{You see Joe Kelly, a Hub police officer.}
 {240}{}{You see Joe Kelly. He is dead.}

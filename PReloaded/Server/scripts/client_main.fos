@@ -89,7 +89,7 @@ import void InitSmartCursor() from "client/smart_cursor";
 
 import uint BonusNumber(Item@ item) from "item_bonus";
 import bool SetImage(string& imageFile, bool limitWindowSizeMaxToImageSize, bool resizeEnabled, bool moveEnabled) from "client/client_GuiImage";
-
+import void InitDialogAvatar() from "client_screen_dialog";
 
 #pragma bindfunc "void OpenURL(string@+) -> client_utils.dll OnlineStats_URL"
 
@@ -181,7 +181,7 @@ bool start()
     InitIndicators();
     InitBagCallbacks();
 	InitSmartCursor();
-
+    InitDialogAvatar();
     InitCritterOnHead(showNpcNames, npcNamesColor, npcNamesQuestRegularColor, npcNamesQuestStoryColor, npcNamesQuestJobColor, npcNamesSearchColor, npcNamesSearchBlink);
     InitDrawEncounters();
     SetBroadcastHudEnabled(broadcastEnabled);
