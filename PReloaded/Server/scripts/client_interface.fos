@@ -266,6 +266,8 @@ uint pickupScreenScrollCritter = 0;
 uint pickupScreenScrollFrom = 0;
 bool disableItemMove = false;
 
+uint LastItemClickTime = 0;
+uint LastItemClickId   = 0;
 
 void unsetall_location_combatzone(int, int, int, string@, array<int>@)
 {
@@ -1077,6 +1079,71 @@ string item_description(ItemCl& item, int lookType)
     }
 
     string result;
+
+if( lookType == ITEM_LOOK_INVENTORY && GUI_GetActiveScreen() == CLIENT_SCREEN_INVENTORY )
+	{
+		uint currentTime = GetTick();
+
+		if( LastItemClickId == item.Id && (currentTime - LastItemClickTime) < 250 )
+		{
+			CritterCl@ chosen = GetChosen();
+
+			if( valid( chosen ) && item.CritId == chosen.Id )
+			{
+				if( item.CritSlot >= SLOT_HAND1 && item.CritSlot <= SLOT_ARMOR || 
+					item.CritSlot >= SLOT_HAND1 && item.CritSlot <= SLOT_HEAD )
+				{
+					array< uint > action = { CHOSEN_MOVE_ITEM, item.Id, item.GetCount(), SLOT_INV, 0, 0, 0 };
+					SetChosenActions( action );
+				}
+				else if (item.CritSlot == SLOT_INV)
+				{
+					uint8 toSlot = SLOT_HAND2;
+					
+					if (item.Proto.Type == ITEM_TYPE_ARMOR)
+					{
+						if( (item.GetProtoId() >= 719) && (item.GetProtoId() <= 749) )
+							toSlot = SLOT_HEAD;
+						else  
+							toSlot = SLOT_ARMOR;
+							
+						array< uint > action = { CHOSEN_MOVE_ITEM, item.Id, item.GetCount(), toSlot, 0, 0, 0 };
+						SetChosenActions( action );
+					}
+					else if (item.Proto.Type == ITEM_TYPE_WEAPON)
+					{
+						toSlot = SLOT_HAND1;
+						array< uint > action = { CHOSEN_MOVE_ITEM, item.Id, item.GetCount(), toSlot, 0, 0, 0 };
+						SetChosenActions( action );
+					}
+					else if( (item.Proto.Type == ITEM_TYPE_DRUG) || 
+						(item.GetProtoId() == PID_BIG_BOOK_OF_SCIENCE ||
+						item.GetProtoId() == PID_DEANS_ELECTRONICS ||
+						item.GetProtoId() == PID_FIRST_AID_BOOK ||
+						item.GetProtoId() == PID_SCOUT_HANDBOOK ||
+						item.GetProtoId() == PID_GUNS_AND_BULLETS ||
+						item.GetProtoId() == PID_BARTER_BOOK) )
+					{
+						array<uint> action = {CHOSEN_USE_ITEM, item.Id, item.GetProtoId(), TARGET_SELF, chosen.Id, ITEM_MODE_USE, 0};
+						SetChosenActions(action);
+					}
+					else if (item.Proto.Type == ITEM_TYPE_MISC || item.Proto.Type == ITEM_TYPE_AMMO || item.Proto.Type == ITEM_TYPE_KEY)
+					{
+						toSlot = SLOT_HAND2;
+						array< uint > action = { CHOSEN_MOVE_ITEM, item.Id, item.GetCount(), toSlot, 0, 0, 0 };
+						SetChosenActions( action );					
+					}
+				}
+			}
+
+			LastItemClickTime = 0;
+			LastItemClickId = 0;
+			return "";
+		}
+
+		LastItemClickTime = currentTime;
+		LastItemClickId = item.Id;
+	}
 
     // Car on world map
     if(lookType == ITEM_LOOK_WM_CAR)
