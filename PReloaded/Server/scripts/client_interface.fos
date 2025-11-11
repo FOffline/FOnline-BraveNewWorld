@@ -1268,6 +1268,87 @@ string item_description(ItemCl& item, int lookType)
             }
         }
 
+		// Alt+Click - 1 item drop from inventory
+       if(lookType == ITEM_LOOK_INVENTORY && GUI_IsKeyPressed(DIK_LMENU))
+		{
+			if(item.GetProtoId()==PID_ADVANCED_BENCH || item.GetProtoId()==PID_WORKBENCH_RAIDERS || item.GetProtoId()==PID_AMMO_FACILITY || item.GetProtoId()==PID_WORKBENCH
+			|| item.GetProtoId()==PID_MED_MACHINE || item.GetProtoId()==PID_WORKBENCH_PRIMITIVE || item.GetProtoId()==PID_CARAVAN_BOX || item.GetProtoId()==PID_ACTIVE_DYNAMITE
+			|| item.GetProtoId()==PID_ACTIVE_PLASTIC_EXPLOSIVE || item.GetProtoId()==PID_ACTIVE_MINE || item.GetProtoId()==PID_ACTIVE_PERSONNEL_MINE || item.GetType()==ITEM_TYPE_CONTAINER)
+				return "";
+
+			if(item.CritSlot == SLOT_ARMOR)
+				return "";
+
+			if(disableItemMove)
+				return "";
+			disableItemMove = true;
+
+			RunServerScriptUnsafe("unsafe_client@unsafe_DropOne", item.Id, 1, 0, "", null);
+
+			if(!chosen.IsKnockout() && !chosen.IsDead() && !chosen.IsAnimPlaying())
+			{
+				chosen.Animate(0, ANIM2_PICKUP);
+			}
+
+			return "";
+		}
+
+		// Alt_Click - 1 item move to/from container & corpse
+		if(GUI_GetActiveScreen() == CLIENT_SCREEN_PICKUP && GUI_IsKeyPressed(DIK_LMENU))
+        {
+
+            if(item.GetProtoId()==PID_ADVANCED_BENCH || item.GetProtoId()==PID_WORKBENCH_RAIDERS || item.GetProtoId()==PID_AMMO_FACILITY || item.GetProtoId()==PID_WORKBENCH || item.GetProtoId()==PID_MED_MACHINE ||  item.GetProtoId()==PID_WORKBENCH_PRIMITIVE || item.GetType()==ITEM_TYPE_CONTAINER)
+                return "";
+
+            if(disableItemMove)
+                return "";
+            disableItemMove = true;
+
+            uint contId = GetContainerId();
+			uint moveCount = 1;
+
+            if(contId > 0)
+            {
+                if(!chosen.IsKnockout() && !chosen.IsDead())
+                {
+                    pickupScreenScrollCritter = GetScroll(SCROLL_PICKUP);
+                    pickupScreenScrollFrom = GetScroll(SCROLL_PICKUP_FROM);
+                    if(item.CritId > 0)
+                        RunServerScriptUnsafe("unsafe_client@unsafe_MoveItemCrit2Cont", item.Id, contId, moveCount, "", null);
+                    else
+                        RunServerScriptUnsafe("unsafe_client@unsafe_MoveItemCont2Crit", item.Id, contId, moveCount, "", null);
+                    if(!chosen.IsAnimPlaying())
+                        chosen.Animate(0, ANIM2_PICKUP);
+                    return "";
+                }
+            }
+
+
+            uint bodyId = GetBodyId();
+
+            if(bodyId > 0)
+            {
+                CritterCl@ body = GetCritter(bodyId);
+                if(valid(body))
+                {
+                    if(!chosen.IsKnockout() && !chosen.IsDead() && body.IsDead())
+                    {
+                        pickupScreenScrollCritter = GetScroll(SCROLL_PICKUP);
+                        pickupScreenScrollFrom = GetScroll(SCROLL_PICKUP_FROM);
+                        if(item.CritId > 0)
+                            RunServerScriptUnsafe("unsafe_client@unsafe_MoveItemCrit2Body", item.Id, bodyId, moveCount, "", null);
+                        else
+                            RunServerScriptUnsafe("unsafe_client@unsafe_MoveItemBody2Crit", item.Id, bodyId, moveCount, "", null);
+                        if(!chosen.IsAnimPlaying())
+                            chosen.Animate(0, ANIM2_PICKUP);
+                        return "";
+                    }
+                }
+            }
+
+            disableItemMove = false;
+        }
+
 
         if(GUI_GetActiveScreen() == CLIENT_SCREEN_PICKUP && GUI_IsKeyPressed(0x1D))
         {
